@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Entity\LoanCalculation;
+use App\Interview\Calculator\DefaultCalculator;
 use App\Interview\CalculatorFactory;
 use App\Interview\Model\CreditCalculationRequest;
+use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
@@ -15,30 +19,54 @@ use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 class LoanController extends AbstractFOSRestController
 {
 
-    private CalculatorFactory $calculatorFactory;
-
-    public function __construct(CalculatorFactory $calculatorFactory) {
-        $this->calculatorFactory = $calculatorFactory;
+    public function __construct(
+        private CalculatorFactory $calculatorFactory,
+        protected EntityManagerInterface $em,
+    ) {
     }
 
     #[Route('/api/calculate', methods:'POST')]
-    public function getUsersAction( 
+    public function postScheduleCalculationAction( 
         #[MapRequestPayload(
             validationFailedStatusCode: Response::HTTP_BAD_REQUEST
         )]CreditCalculationRequest $loanProposal,
         Request $request
         )
     {
-        // dd($loanProposal);
         $data = [];
-        $items = $this->calculatorFactory->create()->calculateRepaymentSchedule($loanProposal);
+        $schedule = $this->calculatorFactory->create()->calculateRepaymentSchedule($loanProposal);
+        $interestRate = DefaultCalculator::$INTEREST_RATE; // Fixed interest rate
 
-        dd($request->getSession()->remove('schedules'));
-        $oldData = $request->getSession()->get('schedules', []);
-        $request->getSession()->set('schedules', array_merge($items, $oldData));
-        $view = $this->view($items, 200);
-        dd($request->getSession()->get('schedules', []));
+        $calculation = new LoanCalculation();
+        $calculation->setAmount($loanProposal->amount());
+        $calculation->setInstallments($loanProposal->amountOfInstallemnts());
+        $calculation->setInterestRate($interestRate);
+        $calculation->setSchedule($schedule);
+        $calculation->setCreatedAt(new \DateTime());
+
+        $this->em->persist($calculation);
+        $this->em->flush();
+
+        
+        $view = $this->view([
+            'calculation' => [
+                'timestamp' => $calculation->getCreatedAt()->format('Y-m-d H:i:s'),
+                'amount' => $loanProposal->amount(),
+                'installments' => $loanProposal->amountOfInstallemnts(),
+                'interest_rate' => $interestRate,
+            ],
+            'schedule' => $schedule
+        ], 200);
         return $this->handleView($view);
+    }
+
+    #[Route('/exclude/{id}', name: 'exclude_calculation', methods: ['DELETE'])]
+    public function excludeCalculation(LoanCalculation $calculation): JsonResponse
+    {
+        $calculation->setExcluded(true);
+        $this->em->flush();
+
+        return new JsonResponse(['message' => 'Calculation excluded']);
     }
 
 
@@ -47,9 +75,20 @@ class LoanController extends AbstractFOSRestController
         Request $request
         )
     {
-        // dd($loanProposal);
-        $data = $request->getSession()->get('schedules', []);
+        $filter = $request->query->get('filter', 'all');
+        $limit = 4;
+        $list = $this->em->getRepository(LoanCalculation::class)->findByFilter($filter, $limit);
 
+        $data = [];
+
+        foreach ($list as $item) {
+            $data[] = [
+                'amount' => $item->getAmount(),
+                'installments' => $item->getInstallments(),
+                'interest_rate' => $item->getInterestRate(),
+                'schedule' => $item->getSchedule(),
+            ];
+        }
         $view = $this->view($data, 200);
 
         return $this->handleView($view);

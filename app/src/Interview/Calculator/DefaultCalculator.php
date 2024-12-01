@@ -14,6 +14,7 @@ use App\Interview\Model\PaymentRate;
 class DefaultCalculator implements FeeCalculator
 {
 
+    public static float $INTEREST_RATE = 0.05;
     private CalculatorLogger $logger;
 
     public function __construct() {
@@ -29,7 +30,7 @@ class DefaultCalculator implements FeeCalculator
     
             $amount = $application->amount();
             $installments = $application->amountOfInstallemnts();
-            $interestRate = 0.05; // Fixed interest rate
+            $interestRate = self::$INTEREST_RATE; // Fixed interest rate
                         
             $monthlyRate = $interestRate / 12;
             $monthlyPayment = $amount * ($monthlyRate * pow(1 + $monthlyRate, $installments)) / (pow(1 + $monthlyRate, $installments) - 1);
@@ -43,6 +44,7 @@ class DefaultCalculator implements FeeCalculator
                 $remainingPrincipal -= $principal;
 
                 $rate = new PaymentRate(round($interest, 2), round($principal, 2), round($monthlyPayment, 2), $i);
+
                 $schedule[] = $rate;
             }
     

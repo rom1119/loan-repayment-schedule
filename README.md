@@ -16,14 +16,24 @@ docker-compose 1.29.2
 2. 
 API endpoint to get token 
  ```
- http://localhost:8000/api/login_check POST 
+ POST http://localhost:8000/api/login_check  
  {
     "username":"test@domain.com",
     "password":"passasd"
   }
 ```
 
-3. running tests
+3. 
+API endpoints make calculations , delete or get last created
+ ```
+ POST http://localhost:8000/api/calculate
+{
+    "amount": 1000,
+    "amountOfInstallemnts": 18
+}
+```
+
+4. running tests
 - first go to docker container and type in commands
   ```
   cd /app

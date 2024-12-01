@@ -20,38 +20,27 @@ class PaymentRate implements \Serializable
         $this->installment = $installment;
     }
 
-    /**
-     * String representation of object.
-     * @link https://php.net/manual/en/serializable.serialize.php
-     * @return string|null The string representation of the object or null
-     * @throws Exception Returning other type than string or null
-     */
     public function serialize()
     {
-        serialize(
+        return serialize(
             [
-                'interest' => $this->interest,
-                'principal' => $this->principal,
-                'payment' => $this->payment,
-                'installment' => $this->installment,
+                $this->interest,
+                $this->principal,
+                $this->payment,
+                $this->installment,
             ]
         );
     }
 
-    /**
-     * Constructs the object.
-     * @link https://php.net/manual/en/serializable.unserialize.php
-     * @param string $data The string representation of the object.
-     * @return void
-     */
     public function unserialize( $dataStr)
     {
-        $data = unserialize($dataStr);
+        list(
+            $this->interest,
+            $this->principal,
+            $this->payment,
+            $this->installment,
+        ) = unserialize($dataStr);
 
-        $this->interest = $data->interest;
-        $this->principal = $data->principal;
-        $this->payment = $data->payment;
-        $this->installment = $data->installment;
     }
 
 
