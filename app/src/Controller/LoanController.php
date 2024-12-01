@@ -6,9 +6,9 @@ namespace App\Controller;
 
 use App\Interview\CalculatorFactory;
 use App\Interview\Model\CreditCalculationRequest;
-use App\Interview\Model\LoanProposal;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations\Route;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 
@@ -25,13 +25,32 @@ class LoanController extends AbstractFOSRestController
     public function getUsersAction( 
         #[MapRequestPayload(
             validationFailedStatusCode: Response::HTTP_BAD_REQUEST
-        )]CreditCalculationRequest $loanProposal
+        )]CreditCalculationRequest $loanProposal,
+        Request $request
         )
     {
         // dd($loanProposal);
         $data = [];
-        $item = $this->calculatorFactory->create()->calculate($loanProposal);
-        $view = $this->view($item, 200);
+        $items = $this->calculatorFactory->create()->calculateRepaymentSchedule($loanProposal);
+
+        dd($request->getSession()->remove('schedules'));
+        $oldData = $request->getSession()->get('schedules', []);
+        $request->getSession()->set('schedules', array_merge($items, $oldData));
+        $view = $this->view($items, 200);
+        dd($request->getSession()->get('schedules', []));
+        return $this->handleView($view);
+    }
+
+
+    #[Route('/api/calculations', name: 'list_calculations', methods: ['GET'])]
+    public function getAllSchedulesAction( 
+        Request $request
+        )
+    {
+        // dd($loanProposal);
+        $data = $request->getSession()->get('schedules', []);
+
+        $view = $this->view($data, 200);
 
         return $this->handleView($view);
     }

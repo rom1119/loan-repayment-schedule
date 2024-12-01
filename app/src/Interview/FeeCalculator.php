@@ -6,12 +6,13 @@ namespace App\Interview;
 
 use App\Interview\Exception\CalculatorException;
 use App\Interview\Model\CreditCalculationRequest;
+use App\Interview\Model\PaymentRate;
 
 interface FeeCalculator
 {
     /**
      * @throws CalculatorException
-     * @return float The calculated total fee.
+     * @return array<PaymentRate> The calculated total fee.
      */
-    public function calculate(CreditCalculationRequest $application): float;
+    public function calculateRepaymentSchedule(CreditCalculationRequest $application): array;
 }

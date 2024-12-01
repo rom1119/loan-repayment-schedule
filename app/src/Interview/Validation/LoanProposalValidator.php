@@ -16,17 +16,18 @@ class LoanProposalValidator
 {
     public static function validate(CreditCalculationRequest $value, ExecutionContextInterface $context, mixed $payload): void
     {
+
         // dd('validation');
-        if ($value->amount() > 12000 || $value->amount() < 1000 || $value->amount() % 500 != 0) {
+        if (!in_array($value->amount(), range(1000, 12000, 500))) {
             $context->buildViolation('Amount is incorrect should be between 1000 and 12000 and devided by 500')
                 ->atPath('amount')
                 ->addViolation()
             ;
         }
         
-        if ($value->amount() > 12000 || $value->amount() < 1000 || $value->amount() % 500 != 0) {
+        if (!in_array($value->amountOfInstallemnts(), range(3, 18, 3))) {
             $context->buildViolation('Amount is incorrect should be between 1000 and 12000 and devided by 500')
-                ->atPath('amount')
+                ->atPath('amountOfInstallemnts')
                 ->addViolation()
             ;
         }

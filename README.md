@@ -13,9 +13,15 @@ docker-compose 1.29.2
   docker-compose up --build
 ```
 
-2. finnally go to [localhost:8000](http://localhost:8000/?term=24&amount=5500) in your browser
-params term and  amount can be changed 
-
+2. 
+API endpoint to get token 
+ ```
+ http://localhost:8000/api/login_check POST 
+ {
+    "username":"test@domain.com",
+    "password":"passasd"
+  }
+```
 
 3. running tests
 - first go to docker container and type in commands

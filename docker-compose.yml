@@ -9,12 +9,33 @@ services:
        - ./app/vendor:/app/vendor
     ports:
       - "8000:8000"
+    depends_on:
+      - db
     networks:
       - app-network
     command: >
-      sh -c "composer install && composer dump-autoload --optimize && php -S 0.0.0.0:8000 -t public"
+      sh -c "composer install && composer dump-autoload --optimize 
+      && php bin/console lexik:jwt:generate-keypair --overwrite
+      && php bin/console doctrine:migrations:migrate --no-interaction
+      && php bin/console app:init-user --no-interaction
+      && php -S 0.0.0.0:8000 -t public"
 
+  db:
+    image: mysql:latest
+    environment:
+      MYSQL_DATABASE: new_db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+      MYSQL_ROOT_USER: root
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - db-data:/var/lib/mysql
+    networks:
+      - app-network
 
+volumes:
+  db-data:
+  shared:
 
 networks:
   app-network:

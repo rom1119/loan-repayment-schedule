@@ -9,6 +9,7 @@ use App\Interview\CalculatorLogger;
 use App\Interview\Exception\CalculatorException;
 use App\Interview\Exception\GeneralCalculatorError;
 use App\Interview\Model\CreditCalculationRequest;
+use App\Interview\Model\PaymentRate;
 
 class DefaultCalculator implements FeeCalculator
 {
@@ -20,27 +21,33 @@ class DefaultCalculator implements FeeCalculator
     }
     /**
      * @throws CalculatorException
-     * @return float The calculated total fee.
+     * @return array<PaymentRate> The calculated total fee.
      */
-    public function calculate(CreditCalculationRequest $application): float
+    public function calculateRepaymentSchedule(CreditCalculationRequest $application): array
     {
         try {
     
-            $this->validateLoanProposal($application, $breakpointsSet);
-    
-            $this->sortAscByAmount($breakpointsSet);
-    
-  
-            $calcFee = $this->calculateFeeValue(
-                $application->amount(),
-                $minBreakpoint->amount(),
-                $maxBreakpoint->amount(),
-                $minBreakpoint->fee(),
-                $maxBreakpoint->fee(),
-            );
+            $amount = $application->amount();
+            $installments = $application->amountOfInstallemnts();
+            $interestRate = 0.05; // Fixed interest rate
                         
-            return $this->roundUpToNearestFive($application->amount(), $calcFee);
-            
+            $monthlyRate = $interestRate / 12;
+            $monthlyPayment = $amount * ($monthlyRate * pow(1 + $monthlyRate, $installments)) / (pow(1 + $monthlyRate, $installments) - 1);
+            $schedule = [];
+
+            $remainingPrincipal = $amount;
+
+            for ($i = 1; $i <= $installments; $i++) {
+                $interest = $remainingPrincipal * $monthlyRate;
+                $principal = $monthlyPayment - $interest;
+                $remainingPrincipal -= $principal;
+
+                $rate = new PaymentRate(round($interest, 2), round($principal, 2), round($monthlyPayment, 2), $i);
+                $schedule[] = $rate;
+            }
+    
+            return $schedule;
+
         } catch (CalculatorException $e) {
             throw $e;
         } catch (\Throwable $e) {
