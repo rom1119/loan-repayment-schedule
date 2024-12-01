@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class LoanController extends AbstractFOSRestController
 {
@@ -27,6 +28,7 @@ class LoanController extends AbstractFOSRestController
     }
 
     #[Route('/api/calculate', methods:'POST')]
+    #[IsGranted('PUBLIC_ACCESS')]
     public function postScheduleCalculationAction( 
         #[MapRequestPayload(
             validationFailedStatusCode: Response::HTTP_BAD_REQUEST
