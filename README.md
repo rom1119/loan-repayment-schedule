@@ -33,6 +33,17 @@ API endpoints make calculations , delete or get last created
 }
 ```
 
+fetch not excluded calculations
+```
+GET http://localhost:8000/api/calculations?filter=not_excluded
+```
+
+excluded calculation
+```
+DELETE http://localhost:8000/api/calculation/exclude/{id_calculation}
+```
+
+
 4. running tests
 - first go to docker container and type in commands
   ```

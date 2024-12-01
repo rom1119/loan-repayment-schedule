@@ -22,6 +22,9 @@ class LoanCalculation
 
     #[ORM\Column(type: "float")]
     private $interestRate;
+    
+    #[ORM\Column(type: "float")]
+    private $totalInterest;
 
     #[ORM\Column(type: "text")]
     private string $schedule = '[]';
@@ -74,6 +77,18 @@ class LoanCalculation
     public function setInterestRate(float $interestRate): self
     {
         $this->interestRate = $interestRate;
+
+        return $this;
+    }
+    
+    public function getTotalInterest(): ?float
+    {
+        return $this->totalInterest;
+    }
+
+    public function setTotalInterest(float $totalInterest): self
+    {
+        $this->totalInterest = $totalInterest;
 
         return $this;
     }

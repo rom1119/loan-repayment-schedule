@@ -8,6 +8,7 @@ use App\Entity\LoanCalculation;
 use App\Interview\Calculator\DefaultCalculator;
 use App\Interview\CalculatorFactory;
 use App\Interview\Model\CreditCalculationRequest;
+use App\Interview\Model\PaymentRate;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations\Route;
@@ -21,7 +22,7 @@ class LoanController extends AbstractFOSRestController
 
     public function __construct(
         private CalculatorFactory $calculatorFactory,
-        protected EntityManagerInterface $em,
+        private EntityManagerInterface $em,
     ) {
     }
 
@@ -41,6 +42,12 @@ class LoanController extends AbstractFOSRestController
         $calculation->setAmount($loanProposal->amount());
         $calculation->setInstallments($loanProposal->amountOfInstallemnts());
         $calculation->setInterestRate($interestRate);
+        $totalInterest = 0;
+        array_map(function (PaymentRate $el) use (&$totalInterest) {
+            $totalInterest += $el->getInterest();
+        }, $schedule);
+
+        $calculation->setTotalInterest($totalInterest);
         $calculation->setSchedule($schedule);
         $calculation->setCreatedAt(new \DateTime());
 
@@ -60,7 +67,7 @@ class LoanController extends AbstractFOSRestController
         return $this->handleView($view);
     }
 
-    #[Route('/exclude/{id}', name: 'exclude_calculation', methods: ['DELETE'])]
+    #[Route('/api/calculation/exclude/{id}', name: 'exclude_calculation', methods: ['DELETE'])]
     public function excludeCalculation(LoanCalculation $calculation): JsonResponse
     {
         $calculation->setExcluded(true);
@@ -83,6 +90,7 @@ class LoanController extends AbstractFOSRestController
 
         foreach ($list as $item) {
             $data[] = [
+                'id' => $item->getId(),
                 'amount' => $item->getAmount(),
                 'installments' => $item->getInstallments(),
                 'interest_rate' => $item->getInterestRate(),

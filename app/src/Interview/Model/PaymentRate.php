@@ -20,6 +20,10 @@ class PaymentRate implements \Serializable
         $this->installment = $installment;
     }
 
+    public function getInterest() {
+        return $this->interest;
+    }
+
     public function serialize()
     {
         return serialize(

@@ -34,7 +34,8 @@ class LoanCalculationRepository extends ServiceEntityRepository
         }
 
         return $queryBuilder
-            ->orderBy('c.createdAt', 'DESC')
+            ->orderBy('c.totalInterest', 'DESC')
+            ->addOrderBy('c.createdAt', 'DESC')
             ->setMaxResults($limit)
             ->getQuery()
             ->getResult();
