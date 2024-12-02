@@ -2,8 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Interview\Model;
-
+namespace App\Domain\Model;
 
 class PaymentRate implements \Serializable
 {
@@ -11,7 +10,7 @@ class PaymentRate implements \Serializable
     private float $principal;
     private float $payment;
     private int $installment;
-    
+
     public function __construct(float $interest, float $principal, float $payment, int $installment)
     {
         $this->interest = $interest;
@@ -20,7 +19,8 @@ class PaymentRate implements \Serializable
         $this->installment = $installment;
     }
 
-    public function getInterest() {
+    public function getInterest()
+    {
         return $this->interest;
     }
 
@@ -36,7 +36,7 @@ class PaymentRate implements \Serializable
         );
     }
 
-    public function unserialize( $dataStr)
+    public function unserialize($dataStr)
     {
         list(
             $this->interest,

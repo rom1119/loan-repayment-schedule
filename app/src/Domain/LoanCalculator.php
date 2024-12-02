@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Interview;
+namespace App\Domain;
 
-use App\Interview\Exception\CalculatorException;
-use App\Interview\Model\CreditCalculationRequest;
-use App\Interview\Model\PaymentRate;
+use App\Domain\Exception\CalculatorException;
+use App\Domain\Model\CreditCalculationRequest;
+use App\Domain\Model\PaymentRate;
 
 interface LoanCalculator
 {

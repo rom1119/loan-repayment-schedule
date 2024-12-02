@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Interview\Exception;
+namespace App\Domain\Exception;
 
 
 class BadLoanAmount extends \Exception implements CalculatorException

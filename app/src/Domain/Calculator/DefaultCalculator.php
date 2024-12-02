@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace App\Interview\Calculator;
+namespace App\Domain\Calculator;
 
-use App\Interview\LoanCalculator;
-use App\Interview\CalculatorLogger;
-use App\Interview\Exception\CalculatorException;
-use App\Interview\Exception\GeneralCalculatorError;
-use App\Interview\Model\CreditCalculationRequest;
-use App\Interview\Model\PaymentRate;
-use App\Interview\Validation\LoanProposalValidator;
+use App\Domain\LoanCalculator;
+use App\Domain\CalculatorLogger;
+use App\Domain\Exception\CalculatorException;
+use App\Domain\Exception\GeneralCalculatorError;
+use App\Domain\Model\CreditCalculationRequest;
+use App\Domain\Model\PaymentRate;
+use App\Domain\Validation\LoanProposalValidator;
 
 class DefaultCalculator implements LoanCalculator
 {
@@ -18,9 +18,9 @@ class DefaultCalculator implements LoanCalculator
     private CalculatorLogger $logger;
     private LoanProposalValidator $validator;
 
-    public function __construct(LoanProposalValidator $validator)
+    public function __construct(LoanProposalValidator $validator, CalculatorLogger $logger)
     {
-        $this->logger = new CalculatorLogger();
+        $this->logger = $logger ;
         $this->validator = $validator;
     }
     /**

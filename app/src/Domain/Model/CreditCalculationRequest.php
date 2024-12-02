@@ -2,17 +2,15 @@
 
 declare(strict_types=1);
 
-namespace App\Interview\Model;
+namespace App\Domain\Model;
 
-use App\Interview\Validation\LoanProposalValidator;
-use Symfony\Component\Validator\Constraints as Assert;
 
-#[Assert\Callback([LoanProposalValidator::class, 'validateStatic'])]
+
 class CreditCalculationRequest
 {
     private int $amount;
     private int $amountOfInstallemnts;
-    
+
     public function __construct(int $amount, int $amountOfInstallemnts)
     {
         $this->amount = $amount;
@@ -36,7 +34,8 @@ class CreditCalculationRequest
         return $this->amount;
     }
 
-    public function __tostring() {
+    public function __tostring()
+    {
         return 'LoanProposal(amount=' . $this->amount() . ',amountOfInstallemnts=' . $this->amountOfInstallemnts() . ')';
     }
 }
