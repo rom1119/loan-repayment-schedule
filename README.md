@@ -45,8 +45,8 @@ DELETE http://localhost:8000/api/calculation/exclude/{id_calculation}
 
 
 4. running tests
-- first go to docker container and type in commands
+- first go to docker container with php app and type in commands
   ```
   cd /app
-  ./vendor/bin/phpunit tests/CalculatorTest.php
+  php bin/phpunit tests/CalculatorTest.php
   ```

@@ -8,7 +8,7 @@ use App\Interview\Exception\CalculatorException;
 use App\Interview\Model\CreditCalculationRequest;
 use App\Interview\Model\PaymentRate;
 
-interface FeeCalculator
+interface LoanCalculator
 {
     /**
      * @throws CalculatorException

@@ -7,7 +7,7 @@ namespace App\Interview\Model;
 use App\Interview\Validation\LoanProposalValidator;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[Assert\Callback([LoanProposalValidator::class, 'validate'])]
+#[Assert\Callback([LoanProposalValidator::class, 'validateStatic'])]
 class CreditCalculationRequest
 {
     private int $amount;

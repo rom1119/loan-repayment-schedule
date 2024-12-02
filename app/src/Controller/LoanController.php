@@ -7,6 +7,7 @@ namespace App\Controller;
 use App\Entity\LoanCalculation;
 use App\Interview\Calculator\DefaultCalculator;
 use App\Interview\CalculatorFactory;
+use App\Interview\Exception\CalculatorException;
 use App\Interview\Model\CreditCalculationRequest;
 use App\Interview\Model\PaymentRate;
 use Doctrine\ORM\EntityManagerInterface;
@@ -36,8 +37,15 @@ class LoanController extends AbstractFOSRestController
         Request $request
         )
     {
-        $data = [];
-        $schedule = $this->calculatorFactory->create()->calculateRepaymentSchedule($loanProposal);
+        try {
+            $schedule = $this->calculatorFactory->create()->calculateRepaymentSchedule($loanProposal);
+
+        } catch(CalculatorException $e) {
+            $view = $this->view([
+                'error' => $e->getMessage()
+            ], 400);
+            return $this->handleView($view);
+        }
         $interestRate = DefaultCalculator::$INTEREST_RATE; // Fixed interest rate
 
         $calculation = new LoanCalculation();

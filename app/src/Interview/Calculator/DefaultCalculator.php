@@ -4,21 +4,24 @@ declare(strict_types=1);
 
 namespace App\Interview\Calculator;
 
-use App\Interview\FeeCalculator;
+use App\Interview\LoanCalculator;
 use App\Interview\CalculatorLogger;
 use App\Interview\Exception\CalculatorException;
 use App\Interview\Exception\GeneralCalculatorError;
 use App\Interview\Model\CreditCalculationRequest;
 use App\Interview\Model\PaymentRate;
+use App\Interview\Validation\LoanProposalValidator;
 
-class DefaultCalculator implements FeeCalculator
+class DefaultCalculator implements LoanCalculator
 {
-
     public static float $INTEREST_RATE = 0.05;
     private CalculatorLogger $logger;
+    private LoanProposalValidator $validator;
 
-    public function __construct() {
+    public function __construct(LoanProposalValidator $validator)
+    {
         $this->logger = new CalculatorLogger();
+        $this->validator = $validator;
     }
     /**
      * @throws CalculatorException
@@ -27,11 +30,11 @@ class DefaultCalculator implements FeeCalculator
     public function calculateRepaymentSchedule(CreditCalculationRequest $application): array
     {
         try {
-    
+            $this->validator->validate($application);
             $amount = $application->amount();
             $installments = $application->amountOfInstallemnts();
             $interestRate = self::$INTEREST_RATE; // Fixed interest rate
-                        
+
             $monthlyRate = $interestRate / 12;
             $monthlyPayment = $amount * ($monthlyRate * pow(1 + $monthlyRate, $installments)) / (pow(1 + $monthlyRate, $installments) - 1);
             $schedule = [];
@@ -47,26 +50,28 @@ class DefaultCalculator implements FeeCalculator
 
                 $schedule[] = $rate;
             }
-    
+
             return $schedule;
 
         } catch (CalculatorException $e) {
             throw $e;
         } catch (\Throwable $e) {
-            $this->logger->logError($e->getMessage(),
-        [
+            $this->logger->logError(
+                $e->getMessage(),
+                [
                 'file' => $e->getFile(),
                 'line' => $e->getLine(),
                 'stackTrace' => $e->getTraceAsString(),
                 'application' => $application,
-            ]);
+            ]
+            );
             throw new GeneralCalculatorError('Somethink went wrong with calculator');
         }
     }
 
 
-    
-    private function comparator( $a,  $b): bool 
+
+    private function comparator($a, $b): bool
     {
         return  $a->amount() > $b->amount();
     }
@@ -74,5 +79,5 @@ class DefaultCalculator implements FeeCalculator
     {
         usort($breakpoints, array($this, "comparator"));
     }
-    
+
 }
