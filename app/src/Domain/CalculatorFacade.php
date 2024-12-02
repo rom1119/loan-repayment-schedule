@@ -20,7 +20,6 @@ class CalculatorFacade
 
     /**
      * @throws CalculatorException
-     * @return array<PaymentRate> The calculated total fee.
      */
     public function makeCalculation(CreditCalculationRequest $creditCalculationRequest, ?CalculationPersister $persister = null): array
     {

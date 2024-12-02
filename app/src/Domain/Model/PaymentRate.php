@@ -24,6 +24,8 @@ class PaymentRate implements \Serializable
         return $this->interest;
     }
 
+    
+
     public function serialize()
     {
         return serialize(
@@ -48,4 +50,20 @@ class PaymentRate implements \Serializable
     }
 
 
+
+    /**
+     * Get the value of payment
+     */ 
+    public function getPayment(): float
+    {
+        return $this->payment;
+    }
+
+    /**
+     * Get the value of principal
+     */ 
+    public function getPrincipal(): float
+    {
+        return $this->principal;
+    }
 }

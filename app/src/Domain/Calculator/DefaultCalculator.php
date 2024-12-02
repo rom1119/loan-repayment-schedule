@@ -23,6 +23,7 @@ class DefaultCalculator implements LoanCalculator
         $this->logger = $logger ;
         $this->validator = $validator;
     }
+    
     /**
      * @throws CalculatorException
      * @return array<PaymentRate> The calculated total fee.
@@ -31,27 +32,15 @@ class DefaultCalculator implements LoanCalculator
     {
         try {
             $this->validator->validate($application);
+
             $amount = $application->amount();
             $installments = $application->amountOfInstallemnts();
             $interestRate = self::$INTEREST_RATE; // Fixed interest rate
 
             $monthlyRate = $interestRate / 12;
             $monthlyPayment = $amount * ($monthlyRate * pow(1 + $monthlyRate, $installments)) / (pow(1 + $monthlyRate, $installments) - 1);
-            $schedule = [];
 
-            $remainingPrincipal = $amount;
-
-            for ($i = 1; $i <= $installments; $i++) {
-                $interest = $remainingPrincipal * $monthlyRate;
-                $principal = $monthlyPayment - $interest;
-                $remainingPrincipal -= $principal;
-
-                $rate = new PaymentRate(round($interest, 2), round($principal, 2), round($monthlyPayment, 2), $i);
-
-                $schedule[] = $rate;
-            }
-
-            return $schedule;
+            return $this->generateLoanSchedule($application, $monthlyRate, $monthlyPayment);
 
         } catch (CalculatorException $e) {
             throw $e;
@@ -69,15 +58,22 @@ class DefaultCalculator implements LoanCalculator
         }
     }
 
+    private function generateLoanSchedule(CreditCalculationRequest $application, float $monthlyRate, float $monthlyPayment): array {
+        $schedule = [];
 
+            $remainingPrincipal = $application->amount();
 
-    private function comparator($a, $b): bool
-    {
-        return  $a->amount() > $b->amount();
-    }
-    private function sortAscByAmount(array &$breakpoints)
-    {
-        usort($breakpoints, array($this, "comparator"));
+            for ($i = 1; $i <= $application->amountOfInstallemnts(); $i++) {
+                $interest = $remainingPrincipal * $monthlyRate;
+                $principal = $monthlyPayment - $interest;
+                $remainingPrincipal -= $principal;
+
+                $rate = new PaymentRate(round($interest, 2), round($principal, 2), round($monthlyPayment, 2), $i);
+
+                $schedule[] = $rate;
+            }
+
+            return $schedule;
     }
 
 }
