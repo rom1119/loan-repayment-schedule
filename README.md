@@ -7,14 +7,13 @@ app launched on
 docker version 20.10.11
 docker-compose 1.29.2
 
-# running
-1. run command 
+
+# 1. run command 
 ```
   docker-compose up --build
 ```
 
-2. 
-API endpoint to get token 
+# 2. API endpoint to get token 
  ```
  POST http://localhost:8000/api/login_check  
  {
@@ -23,8 +22,8 @@ API endpoint to get token
   }
 ```
 
-3. 
-API endpoints make calculations , delete or get last created
+# 3. API endpoints make calculations , delete or get last created
+- make calculations
  ```
  POST http://localhost:8000/api/calculate
 {
@@ -33,18 +32,18 @@ API endpoints make calculations , delete or get last created
 }
 ```
 
-fetch not excluded calculations
+- fetch not excluded calculations
 ```
 GET http://localhost:8000/api/calculations?filter=not_excluded
 ```
 
-excluded calculation
+- excluded calculation
 ```
 DELETE http://localhost:8000/api/calculation/exclude/{id_calculation}
 ```
 
 
-4. running tests
+# 4. running tests
 - first go to docker container with php app and type in commands
   ```
   cd /app
